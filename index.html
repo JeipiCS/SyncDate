@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=ADLaM+Display" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="sync-icon2.jpg" width='256' height='256' viewBox='0 0 256 256'
+        %3E%3Crect style='fill:%23FF3010;stroke:none' width='256' height='256' x='0' y='0' /%3E%3C/svg%3E">
+
+    <title>SyncDate – Student Planner</title>
+    <style>
+        * {
+            box-sizing: border-box;
+
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+        }
+
+        body {
+            min-width: 320px;
+            margin: 0;
+            color-scheme: light;
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            color: #1c2433;
+            background:
+                radial-gradient(ellipse at top left, #d6e4f7 0, transparent 38%),
+                #f3f6fb;
+            background-attachment: fixed;
+        }
+
+        .page {
+            width: min(1120px, 100%);
+            margin: 0 auto;
+            padding: 0 clamp(16px, 4vw, 48px) 64px;
+        }
+
+        /* ---------- Header: brand, logo slot, section links, bell ---------- */
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgb(243 246 251 / 90%);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            background: white;
+        }
+
+        .header-inner {
+            position: relative;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px 24px;
+            width: min(1120px, 100%);
+            margin: 0 auto;
+            padding: 18px clamp(16px, 4vw, 48px);
+            background: #FDFDFD;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logob {
+            width: 300px;
+            vertical-align: middle;
+            pointer-events: none;
+            position: relative;
+            top: 5px;
+            right: 35px;
+        }
+
+        .brand h1 {
+            margin: 0;
+            color: #000;
+            font-size: clamp(2rem, 5vw, 3.4rem);
+            line-height: 1;
+            letter-spacing: -0.01em;
+        }
+
+        /* Reserved spot for your logo: put an <img> inside .logo-slot and delete the gray background. */
+        .logo-slot {
+            height: 94px;
+            flex-shrink: 0;
+            border-radius: 12px;
+            position: relative;
+            left: -10px;
+            top: -3px;
+        }
+
+        .logo-slot img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: clamp(16px, 4vw, 52px);
+        }
+
+        .header-nav a.section-link {
+            color: #8d95a3;
+            font-size: 0.95rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+
+        .header-nav a.section-link:hover,
+        .header-nav a.section-link:focus-visible {
+            color: #1f3a68;
+            transform: translateY(-2px);
+        }
+
+        .header-nav a.section-link:active {
+            transform: scale(0.95);
+        }
+
+        /* ---------- Notification bell + popup ---------- */
+        .notif-wrap {
+            position: relative;
+        }
+
+        .bell-btn {
+            position: relative;
+            display: grid;
+            place-items: center;
+            width: 42px;
+            height: 42px;
+            padding: 0;
+            border: 0;
+            border-radius: 50%;
+            background: transparent;
+            color: #8d95a3;
+            cursor: pointer;
+            transition: background-color 160ms ease, color 160ms ease;
+        }
+
+        .bell-btn:hover,
+        .bell-btn[aria-expanded="true"] {
+            background: #e8eef8;
+            color: #1f3a68;
+        }
+
+        .bell-btn svg {
+            width: 26px;
+            height: 26px;
+        }
+
+        .bell-btn.ring svg {
+            animation: ring 900ms ease-in-out;
+            transform-origin: 50% 10%;
+        }
+
+        @keyframes ring {
+
+            0%,
+            100% {
+                transform: rotate(0);
+            }
+
+            15% {
+                transform: rotate(16deg);
+            }
+
+            35% {
+                transform: rotate(-14deg);
+            }
+
+            55% {
+                transform: rotate(9deg);
+            }
+
+            75% {
+                transform: rotate(-6deg);
+            }
+        }
+
+        .bell-badge {
+            position: absolute;
+            top: 2px;
+            right: 1px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 999px;
+            background: #b3392f;
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            line-height: 18px;
+            text-align: center;
+        }
+
+        .bell-badge[hidden] {
+            display: none;
+        }
+
+        .notif-panel {
+            position: absolute;
+            top: calc(100% + 12px);
+            right: 0;
+            z-index: 60;
+            width: min(280px, calc(100vw - 32px));
+            max-height: min(70vh, 480px);
+            overflow-y: auto;
+            padding: 16px;
+            border: 1px solid #dde5f1;
+            border-radius: 16px;
+            background: #d3def0;
+            box-shadow: 0 16px 40px rgb(20 35 70 / 18%);
+            animation: pop 160ms ease-out;
+        }
+
+        .notif-panel[hidden] {
+            display: none;
+        }
+
+        @keyframes pop {
+            from {
+                opacity: 0;
+                transform: translateY(-6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .notif-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 0 0 12px;
+            color: #1b2a4a;
+            font-size: 1rem;
+        }
+
+        .notif-list {
+            display: grid;
+            gap: 10px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .notif-item {
+            padding: 12px;
+            border: 1px solid #dde5f1;
+            border-radius: 12px;
+            background: #f6f9fe;
+        }
+
+        .notif-item.overdue {
+            border-color: #f0c9c4;
+            background: #fff1ef;
+        }
+
+        .notif-item strong {
+            display: block;
+            color: #1b2a4a;
+            overflow-wrap: anywhere;
+        }
+
+        .notif-item p {
+            margin: 4px 0 10px;
+            color: #3f5a8a;
+            font-size: 0.85rem;
+        }
+
+        .notif-item.overdue p {
+            color: #8f2c24;
+        }
+
+        .notif-empty {
+            margin: 0;
+            padding: 18px 8px;
+            color: #3f5a8a;
+            text-align: center;
+            font-size: 0.92rem;
+        }
+
+        .notif-complete {
+            min-height: 34px;
+            padding: 6px 12px;
+            border: 0;
+            border-radius: 8px;
+            background: #378657;
+            color: #fff;
+            font: inherit;
+            font-size: 0.85rem;
+            font-weight: 650;
+            cursor: pointer;
+        }
+
+        .notif-complete:hover {
+            background: #286d43;
+        }
+
+        /* ---------- Hero ---------- */
+        .hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: clamp(24px, 6vw, 80px);
+            align-items: stretch;
+            padding-top: 16px;
+        }
+
+        .hero-left {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 32px;
+            padding: 0 clamp(0px, 1vw, 12px);
+            position: relative;
+            bottom: -25px;
+        }
+
+        .hero-text h2 {
+            margin: 0 0 12px;
+            color: #1b2a4a;
+            font-size: clamp(1.4rem, 3vw, 1.9rem);
+            line-height: 1.2;
+            position: relative;
+            top: 4px;
+        }
+
+        .hero-text p {
+            margin: 0 0 10px;
+            max-width: 46ch;
+            font-weight: 600;
+            line-height: 1.6;
+        }
+
+        .hero-text p,
+        .hero-text h2 {
+            position: relative;
+            top: 1px;
+        }
+
+        .progress-card {
+            padding: 37px 34px 36px;
+            border-radius: 22px;
+            background: #1f3a68;
+            color: #fff;
+        }
+
+        .progress-card,
+        .pill-btn {
+            position: relative;
+            top: -45px;
+        }
+
+        .progress-card .progress-head {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-bottom: 22px;
+        }
+
+        .progress-card h3 {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        .progress-card .count {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #d3def0;
+        }
+
+        progress {
+            display: block;
+            width: 100%;
+            height: 12px;
+            overflow: hidden;
+            border: 0;
+            border-radius: 999px;
+            background: #d9d9d9;
+            accent-color: #8fb4ee;
+        }
+
+        progress::-webkit-progress-bar {
+            border-radius: 999px;
+            background: #d9d9d9;
+        }
+
+        progress::-webkit-progress-value {
+            border-radius: 999px;
+            background: #8fb4ee;
+        }
+
+        progress::-moz-progress-bar {
+            border-radius: 999px;
+            background: #8fb4ee;
+        }
+
+        .pill-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .pill-btn {
+            flex: 1 1 160px;
+            padding: 14px 20px;
+            border-radius: 999px;
+            background: #d3def0;
+            color: #000;
+            font-weight: 700;
+            text-align: center;
+            text-decoration: none;
+            transition: background-color 160ms ease, transform 160ms ease;
+        }
+
+        .pill-btn:hover {
+            background: #bfcfe9;
+            transform: translateY(-1px);
+        }
+
+        /* Big blue panel from the mockup */
+        .hero-panel {
+            min-height: 20px;
+            border-radius: 22px;
+            background: #d3def0;
+            background-image: url("884501739_1776821566929759_3951790236883467276_n.jpg") no-repeat/contain;
+            background-size: contain;
+            background-position: 8px;
+            padding-left: 0px;
+        }
+
+        .ad-pic {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 22px;
+            position: relative;
+            right: -20px;
+            pointer-events: none;
+        }
+
+        a:focus-visible,
+        button:focus-visible {
+            outline: 3px solid #6c9bd8;
+            outline-offset: 2px;
+        }
+
+        /* ---------- Scroll-to sections ---------- */
+        .section {
+            margin-top: clamp(56px, 9vw, 110px);
+            scroll-margin-top: 130px;
+        }
+
+        .section h2 {
+            margin: 0 0 8px;
+            color: #1b2a4a;
+            font-size: clamp(1.5rem, 3vw, 2rem);
+        }
+
+        .section .lead {
+            margin: 0 0 28px;
+            max-width: 60ch;
+            color: #3f5a8a;
+            line-height: 1.6;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 18px;
+        }
+
+        .card {
+            padding: 22px;
+            border: 1px solid #dde5f1;
+            border-radius: 18px;
+            background: #fff;
+            box-shadow: 0 8px 24px rgb(20 35 70 / 6%);
+        }
+
+        .card .icon {
+            display: grid;
+            place-items: center;
+            width: 44px;
+            height: 44px;
+            margin-bottom: 14px;
+            border-radius: 12px;
+            background: #e8eef8;
+            font-size: 1.4rem;
+        }
+
+        .card h3 {
+            margin: 0 0 6px;
+            color: #1b2a4a;
+            font-size: 1.05rem;
+        }
+
+        .card p {
+            margin: 0;
+            color: #3a4558;
+            font-size: 0.93rem;
+            line-height: 1.55;
+        }
+
+        .steps {
+            display: grid;
+            gap: 16px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            counter-reset: step;
+        }
+
+        .steps li {
+            position: relative;
+            padding: 18px 20px 18px 72px;
+            border: 1px solid #dde5f1;
+            border-radius: 16px;
+            background: #fff;
+            counter-increment: step;
+        }
+
+        .steps li::before {
+            content: counter(step);
+            position: absolute;
+            top: 50%;
+            left: 18px;
+            display: grid;
+            place-items: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #1f3a68;
+            color: #fff;
+            font-weight: 700;
+            transform: translateY(-50%);
+        }
+
+        .steps strong {
+            display: block;
+            margin-bottom: 2px;
+            color: #1b2a4a;
+        }
+
+        .steps span {
+            color: #3a4558;
+            font-size: 0.93rem;
+            line-height: 1.5;
+        }
+
+        .dev-card {
+            text-align: center;
+        }
+
+        .avatar {
+            display: grid;
+            place-items: center;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 14px;
+            border-radius: 50%;
+            background: #d3def0;
+            color: #1f3a68;
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        .site-footer {
+            margin-top: 80px;
+            color: #8d95a3;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-panel {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 0;
+            }
+        }
+
+        @media (max-width: 800px) {
+
+            .logo-slot {
+                width: 60px;
+                height: 60px;
+            }
+
+            .brand {
+                gap: 6px;
+                align-items: center;
+            }
+
+            .logob {
+                pointer-events: none;
+                width: 180px;
+                right: 15px;
+                top: 0;
+            }
+
+            .ad-pic {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+                border-radius: 22px;
+                position: relative;
+                right: -20px;
+                bottom: -2px;
+                pointer-events: none;
+            }
+
+            .hero-panel {
+                min-height: 20px;
+                border-radius: 22px;
+                background: #d3def0;
+                background-position: 8px;
+                position: relative;
+                left: -10px;
+            }
+
+            .progress-card,
+            .pill-btn {
+                position: relative;
+                top: -21px;
+            }
+
+            .hero-text h2 {
+                margin: 0 0 12px;
+                color: #1b2a4a;
+                font-size: clamp(1.4rem, 3vw, 1.9rem);
+                line-height: 1.2;
+                position: relative;
+                top: 4px;
+            }
+
+            .header-nav {
+                width: 100%;
+                justify-content: center;
+                gap: 30px;
+                position: relative;
+                right: 0;
+                flex-wrap: wrap;
+            }
+
+            .notif-panel {
+                position: fixed;
+                top: 84px;
+                right: 16px;
+                left: 16px;
+                width: auto;
+            }
+
+            .bell-btn {
+                position: relative;
+                right: 0;
+            }
+        }
+
+        .logo-icon {
+            pointer-events: none;
+            border: white;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <div class="brand">
+                <!-- Logo goes here: <img src="logo.png" alt="SyncDate logo"> -->
+                <div class="logo-slot" aria-label="Logo placeholder">
+                    <a href="syncdate-icon.png" target="_blank" rel="noopener noreferrer" class="logo-icon">
+                        <img src="syncdate-icon.png" alt="logo">
+                    </a>
+                </div>
+                <div class="logo-container">
+                    <h1 class="logo-text">
+                        <img src="syncdate-wordmark.png" alt="SyncDate" class="logob">
+                    </h1>
+                </div>
+            </div>
+
+            <nav class="header-nav" aria-label="Page sections">
+                <a class="section-link" href="#features">features</a>
+                <a class="section-link" href="#how-it-works">how it works</a>
+                <a class="section-link" href="#developers">developers</a>
+
+                <div class="notif-wrap">
+                    <button type="button" id="bell-btn" class="bell-btn" aria-label="Notifications" aria-haspopup="true"
+                        aria-expanded="false" aria-controls="notif-panel">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                            <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                        </svg>
+                        <span id="bell-badge" class="bell-badge" hidden>0</span>
+                    </button>
+
+                    <div id="notif-panel" class="notif-panel" role="region" aria-label="Notifications" hidden>
+                        <h2 class="notif-title">🔔 Notifications</h2>
+                        <ul id="notif-list" class="notif-list" aria-live="polite"></ul>
+                        <p id="notif-empty" class="notif-empty" hidden>You're all caught up. No task reminders right
+                            now. 🎉</p>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="page">
+        <section class="hero" aria-label="Welcome">
+            <div class="hero-left">
+                <div class="hero-text">
+                    <h2>TURNING ACADEMIC CHAOS INTO CLARITY, ONE DEADLINE AT A TIME</h2>
+                    <p>College students frequently juggle overlapping programming labs, research papers, exams, and team
+                        projects across fragmented apps and notebooks—often resulting in forgotten deadlines, time
+                        conflicts, and unnecessary academic stress. </p>
+                    <p>SyncDate solves this problem by bringing all tasks into a single intelligent workspace. Through
+                        continuous priority scoring, proactive deadline alerts, and automatic task ranking, SyncDate
+                        eliminates schedule clutter and tells students exactly what to focus on first, ensuring every
+                        deadline is met with confidence.</p>
+                </div>
+
+                <div>
+                    <div class="progress-card">
+                        <div class="progress-head">
+                            <h3>Progress</h3>
+                            <span class="count" id="progress-text">0 / 0 tasks</span>
+                        </div>
+                        <progress id="progress-bar" value="0" max="100"
+                            aria-label="Task completion progress"></progress>
+                    </div>
+
+                    <div class="pill-row" style="margin-top: 28px;">
+                        <a class="pill-btn" href="planner.html">Planner</a>
+                        <a class="pill-btn" href="completed.html">Completed Tasks</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-panel" aria-hidden="true">
+                <a href="Sync_ad.jpg">
+                    <img class="ad-pic" src="Sync_ad.jpg" alt="Syncdate advertisement">
+                </a>
+            </div>
+        </section>
+
+        <section id="features" class="section">
+            <h2>Features</h2>
+            <p class="lead">Everything you need to stay on top of schoolwork, in one simple place.</p>
+            <div class="card-grid">
+                <article class="card">
+                    <div class="icon">📊</div>
+                    <h3>Smart ranking</h3>
+                    <p>Tasks are scored by time left, urgency and importance, so the most pressing work rises to the
+                        top of your list.</p>
+                </article>
+                <article class="card">
+                    <div class="icon">⏰</div>
+                    <h3>Deadline reminders</h3>
+                    <p>Get a heads-up before something is due. More important tasks remind you earlier.</p>
+                </article>
+                <article class="card">
+                    <div class="icon">🚫</div>
+                    <h3>Conflict detection</h3>
+                    <p>SyncDate warns you if a new task lands on a time slot you have already booked.</p>
+                </article>
+                <article class="card">
+                    <div class="icon">🔁</div>
+                    <h3>Overdue recovery</h3>
+                    <p>Missed a deadline? Recover the task and push it forward a day with one click.</p>
+                </article>
+                <article class="card">
+                    <div class="icon">✅</div>
+                    <h3>Completed archive</h3>
+                    <p>Finished tasks move to their own page, keeping your planner clean while your wins stay on
+                        record.</p>
+                </article>
+                <article class="card">
+                    <div class="icon">📈</div>
+                    <h3>Progress tracking</h3>
+                    <p>A live progress bar shows how much of your workload you have already finished.</p>
+                </article>
+            </div>
+        </section>
+
+        <section id="how-it-works" class="section">
+            <h2>How it works</h2>
+            <p class="lead">From to-do to done in four steps.</p>
+            <ol class="steps">
+                <li><strong>Add a task</strong><span>Enter what it is, where it happens, the task type and the due date
+                        and time.</span></li>
+                <li><strong>Rate it</strong><span>Use the sliders to set how urgent and how important it is. SyncDate
+                        classifies its priority for you.</span></li>
+                <li><strong>Follow the ranking</strong><span>Your schedule is sorted automatically, and reminders pop up
+                        in the bell above as deadlines get close.</span></li>
+                <li><strong>Mark it complete</strong><span>Check it off and it moves to the Completed Tasks page while
+                        your progress bar fills up.</span></li>
+            </ol>
+        </section>
+
+        <section id="developers" class="section">
+            <h2>Developers</h2>
+            <p class="lead">The people behind SyncDate.</p>
+            <div class="card-grid">
+                <article class="card dev-card">
+                    <div class="avatar">
+                        <img src="Fabelina.jpg" alt="fabelina"
+                            style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%;">
+                    </div>
+                    <h3>Lance Aljur M. Fabeliña</h3>
+                    <p>Front-End Developer</p>
+                </article>
+                <article class="card dev-card">
+                    <div class="avatar">B</div>
+                    <h3>John Patrick Miranda</h3>
+                    <p>Back-End Developer</p>
+                </article>
+                <article class="card dev-card">
+                    <div class="avatar">C</div>
+                    <h3>Shaira Lee</h3>
+                    <p>Role / what they worked on</p>
+                </article>
+                <article class="card dev-card">
+                    <div class="avatar">C</div>
+                    <h3>Nerain Francisco Malit</h3>
+                    <p>Role / what they worked on</p>
+                </article>
+                <article class="card dev-card">
+                    <div class="avatar">C</div>
+                    <h3>Lei Maverick Quilon</h3>
+                    <p>Role / what they worked on</p>
+                </article>
+            </div>
+        </section>
+
+        <footer class="site-footer">© SyncDate</footer>
+    </main>
+
+    <script>
+        // ---- Shared task storage (same key as planner.html and completed.html) ----
+        const STORAGE_KEY = 'student_tasks';
+        let tasks = loadTasks();
+
+        function loadTasks() {
+            try {
+                const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
+                return Array.isArray(data) ? data : [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function saveTasks() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+        }
+
+        const bellButton = document.getElementById('bell-btn');
+        const bellBadge = document.getElementById('bell-badge');
+        const panel = document.getElementById('notif-panel');
+        const notifList = document.getElementById('notif-list');
+        const notifEmpty = document.getElementById('notif-empty');
+        const progressText = document.getElementById('progress-text');
+        const progressBar = document.getElementById('progress-bar');
+
+        // ---- Same reminder rules as the planner: more important tasks remind earlier ----
+        const LEAD_MINUTES = { 1: 30, 2: 30, 3: 60, 4: 120, 5: 180 };
+
+        function reminderStart(task) {
+            const lead = (LEAD_MINUTES[task.importance] || 60) * 60 * 1000;
+            return new Date(task.date).getTime() - lead;
+        }
+
+        function scheduleReminder(task) {
+            task.nextReminderAt = new Date(reminderStart(task)).toISOString();
+        }
+
+        // A task is "notifying" once its reminder time has passed and it is not complete.
+        function getNotifications() {
+            const now = Date.now();
+            return tasks
+                .filter(task => !task.completed && task.date && reminderStart(task) <= now)
+                .sort((a, b) => new Date(a.date) - new Date(b.date));
+        }
+
+        // ---- Popup open/close ----
+        let autoCloseTimer = null;
+
+        function setPanel(open, auto = false) {
+            panel.hidden = !open;
+            bellButton.setAttribute('aria-expanded', String(open));
+            clearTimeout(autoCloseTimer);
+
+            // Auto-opened popups fade away after 15 seconds; manually opened ones stay until closed.
+            if (open && auto) {
+                autoCloseTimer = setTimeout(() => setPanel(false), 15000);
+            }
+        }
+
+        bellButton.addEventListener('click', () => setPanel(panel.hidden));
+
+        document.addEventListener('click', event => {
+            if (!panel.hidden && !panel.contains(event.target) && !bellButton.contains(event.target)) {
+                setPanel(false);
+            }
+        });
+
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape' && !panel.hidden) {
+                setPanel(false);
+                bellButton.focus();
+            }
+        });
+
+        // ---- Rendering ----
+        function renderNotifications() {
+            const items = getNotifications();
+            notifList.innerHTML = '';
+            notifEmpty.hidden = items.length > 0;
+
+            items.forEach(task => {
+                const due = new Date(task.date);
+                const overdue = due < new Date();
+
+                const li = document.createElement('li');
+                li.className = 'notif-item' + (overdue ? ' overdue' : '');
+
+                const title = document.createElement('strong');
+                title.textContent = task.name;
+
+                const info = document.createElement('p');
+                const dueText = due.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
+                info.textContent = overdue
+                    ? `⚠️ Overdue since ${dueText}`
+                    : `Due ${dueText} · Importance ${task.importance}/5`;
+
+                const done = document.createElement('button');
+                done.type = 'button';
+                done.className = 'notif-complete';
+                done.textContent = 'Mark complete';
+                done.addEventListener('click', () => completeTask(task.id));
+
+                li.append(title, info, done);
+                notifList.appendChild(li);
+            });
+
+            bellBadge.hidden = items.length === 0;
+            bellBadge.textContent = items.length > 9 ? '9+' : items.length;
+            bellButton.setAttribute('aria-label',
+                items.length ? `Notifications (${items.length})` : 'Notifications');
+        }
+
+        function renderProgress() {
+            const completed = tasks.filter(task => task.completed).length;
+            progressText.textContent = `${completed} / ${tasks.length} tasks`;
+            progressBar.value = tasks.length ? (completed / tasks.length) * 100 : 0;
+        }
+
+        function renderAll() {
+            renderNotifications();
+            renderProgress();
+        }
+
+        function completeTask(id) {
+            const task = tasks.find(t => t.id === id);
+            if (!task) return;
+            task.completed = true;
+            task.completedAt = new Date().toISOString();
+            saveTasks();
+            renderAll();
+        }
+
+        // ---- Reminder checks: when a reminder comes due, pop the panel open for a while ----
+        function checkReminders() {
+            const now = Date.now();
+            const due = tasks.filter(task =>
+                !task.completed && task.nextReminderAt && new Date(task.nextReminderAt).getTime() <= now
+            );
+
+            due.forEach(task => {
+                task.nextReminderAt = new Date(now + 10 * 60 * 1000).toISOString();
+            });
+
+            if (due.length > 0) {
+                saveTasks();
+                renderAll();
+
+                bellButton.classList.remove('ring');
+                void bellButton.offsetWidth; // restart the animation
+                bellButton.classList.add('ring');
+
+                // Don't disturb a panel the user already opened themselves.
+                if (panel.hidden) {
+                    setPanel(true, true);
+                }
+            }
+        }
+
+        // Give older saved tasks a reminder time, like the planner does.
+        let scheduleChanged = false;
+        tasks.forEach(task => {
+            if (!task.completed && !task.nextReminderAt && task.date) {
+                scheduleReminder(task);
+                scheduleChanged = true;
+            }
+        });
+        if (scheduleChanged) saveTasks();
+
+        renderAll();
+        checkReminders();
+        setInterval(() => {
+            checkReminders();
+            renderAll();
+        }, 30 * 1000);
+
+        // Stay in sync when the planner or completed page changes tasks in another tab.
+        window.addEventListener('storage', event => {
+            if (event.key === STORAGE_KEY) {
+                tasks = loadTasks();
+                renderAll();
+            }
+        });
+    </script>
+</body>
+
+</html>

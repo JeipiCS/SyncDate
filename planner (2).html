@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" , content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=ADLaM+Display" rel="stylesheet">
+     <link rel="icon" type="image/svg+xml" href="sync-icon2.jpg" width='256' height='256' viewBox='0 0 256 256'
+        %3E%3Crect style='fill:%23FF3010;stroke:none' width='256' height='256' x='0' y='0' /%3E%3C/svg%3E">
+    
+    <title>My Student Calendar</title>
+    <style>
+        /* Shared styles used by the original planner pages. */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #d6e4f7;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .logob {
+            width: 350px;
+            vertical-align: middle;
+            pointer-events: none;
+            position: relative;
+            top: 0px;
+            right: -15px;
+        }
+
+        h2 {
+            color: #fcfdfd;
+        }
+
+        .dashboard {
+            background-color: #1f3a68;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            color: #fcfdfd;
+        }
+
+        progress {
+            width: 100%;
+            height: 20px;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 20px;
+        }
+
+        .form-section {
+            flex: 1;
+            background: #fafafa;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+
+        .form-section label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .form-section input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .form-section button {
+            margin-top: 15px;
+            width: 100%;
+            background: #2f5597;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .form-section button:hover {
+            background: #244480;
+        }
+
+        .list-section {
+            flex: 2;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            border: 1px solid #000;
+            padding: 10px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background: #d6e4f7;
+            color: #000;
+        }
+
+        button.complete-btn {
+            background: #2ecc71;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        button.complete-btn:hover {
+            background: #27ae60;
+        }
+
+        .my_schedule {
+            background-color: #1f3a68;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .planbox {
+            background-color: #e9f6f7;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .slider-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .slider-box small {
+            font-size: 12px;
+            min-width: 70px;
+            color: #2f5597;
+            font-weight: bold;
+        }
+
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .planbox {
+                width: 100%;
+                padding: 10px;
+                box-sizing: border-box;
+            }
+
+            .form-section {
+                width: 100%;
+                padding: 10px;
+            }
+
+            input,
+            select,
+            button {
+                width: 100%;
+                font-size: 16px;
+            }
+
+            .slider-box {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            h1 {
+                font-size: 24px;
+                text-align: center;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+        }
+
+        /* Modern visual theme for combined-1.html only. */
+        body.combined-one-page {
+            color-scheme: light;
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            color: #1c2433;
+            background: #f3f6fb;
+            font-synthesis: none;
+        }
+
+        body.combined-one-page * {
+            box-sizing: border-box;
+        }
+
+        body.combined-one-page {
+            min-width: 320px;
+            margin: 0;
+            padding: clamp(16px, 4vw, 48px);
+            background:
+                radial-gradient(ellipse at top left, #d6e4f7 0, transparent 38%),
+                #f3f6fb;
+        }
+
+        body.combined-one-page .planbox {
+            width: min(1120px, 100%);
+            margin: 0 auto;
+            padding: clamp(20px, 4vw, 40px);
+            background: #fff;
+            border: 1px solid #dde5f1;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgb(20 35 70 / 10%);
+        }
+
+        body.combined-one-page h1 {
+            margin: 0 0 28px;
+            color: #1b2a4a;
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+        }
+
+        body.combined-one-page h2 {
+            margin: 0 0 16px;
+            color: #1b2a4a;
+            font-size: 1.35rem;
+        }
+
+        body.combined-one-page h3 {
+            margin: 0 0 10px;
+        }
+
+        /* Two-column task form that collapses to one column on small screens. */
+        body.combined-one-page .form-section {
+            padding: clamp(16px, 3vw, 28px);
+            background: #f6f9fe;
+            border: 1px solid #dde5f1;
+            border-radius: 18px;
+        }
+
+        body.combined-one-page .planner-form {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        body.combined-one-page .form-field label {
+            display: block;
+            margin-top: 0;
+            margin-bottom: 8px;
+            color: #2b3a57;
+            font-size: 0.94rem;
+            font-weight: 650;
+        }
+
+        body.combined-one-page .form-field input:not([type="range"]),
+        body.combined-one-page .form-field select {
+            width: 100%;
+            min-height: 46px;
+            margin-top: 0;
+            padding: 10px 12px;
+            border: 1px solid #c3cfe3;
+            border-radius: 10px;
+            background: #fff;
+            color: #1c2433;
+            font: inherit;
+        }
+
+        body.combined-one-page .form-field input:focus-visible,
+        body.combined-one-page .form-field select:focus-visible,
+        body.combined-one-page button:focus-visible {
+            outline: 3px solid #6c9bd8;
+            outline-offset: 2px;
+        }
+
+        /* Slider layout, live value labels, and priority classification panel. */
+        body.combined-one-page .slider-box {
+            display: flex;
+            min-height: 46px;
+            align-items: center;
+            gap: 12px;
+        }
+
+        body.combined-one-page .slider-box input {
+            flex: 1;
+            accent-color: #3f6bb5;
+        }
+
+        body.combined-one-page .slider-box small {
+            min-width: 76px;
+            color: #3f5a8a;
+            font-size: 0.8rem;
+            font-weight: 650;
+        }
+
+        body.combined-one-page .reminder-help {
+            grid-column: 1 / -1;
+            margin: -8px 0 0;
+            color: #3f5a8a;
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+
+        body.combined-one-page .classification {
+            grid-column: 1 / -1;
+            padding: 14px;
+            border-radius: 12px;
+            background: #e6eefa;
+            color: #1f3a68;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        body.combined-one-page button {
+            min-height: 42px;
+            margin-top: 0;
+            padding: 10px 14px;
+            border: 0;
+            border-radius: 10px;
+            color: #fff;
+            font: inherit;
+            font-weight: 650;
+            cursor: pointer;
+            transition: background-color 160ms ease, transform 160ms ease;
+        }
+
+        body.combined-one-page button:hover {
+            transform: translateY(-1px);
+        }
+
+        body.combined-one-page .submit {
+            grid-column: 1 / -1;
+            min-height: 48px;
+            background: #2f5597;
+        }
+
+        body.combined-one-page .submit:hover {
+            background: #244480;
+        }
+
+        /* Dashboard progress bar and schedule table styling. */
+        body.combined-one-page .dashboard {
+            margin: 28px 0;
+            padding: 20px;
+            border-radius: 16px;
+            background: #1f3a68;
+            color: #fff;
+        }
+
+        body.combined-one-page .dashboard p {
+            margin: 0 0 12px;
+        }
+
+        body.combined-one-page progress {
+            display: block;
+            width: 100%;
+            height: 12px;
+            overflow: hidden;
+            border: 0;
+            border-radius: 999px;
+            background: #d3def0;
+            accent-color: #8fb4ee;
+        }
+
+        body.combined-one-page progress::-webkit-progress-bar {
+            border-radius: 999px;
+            background: #d3def0;
+        }
+
+        body.combined-one-page progress::-webkit-progress-value {
+            border-radius: 999px;
+            background: #8fb4ee;
+        }
+
+        body.combined-one-page progress::-moz-progress-bar {
+            border-radius: 999px;
+            background: #8fb4ee;
+        }
+
+        body.combined-one-page .my_schedule {
+            padding: clamp(16px, 3vw, 24px);
+            border: 1px solid #dde5f1;
+            border-radius: 18px;
+            background: #fff;
+        }
+
+        body.combined-one-page .table-wrapper {
+            overflow-x: auto;
+        }
+
+        body.combined-one-page .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        body.combined-one-page .schedule-table th,
+        body.combined-one-page .schedule-table td {
+            padding: 13px 12px;
+            border-bottom: 1px solid #dde5f1;
+            vertical-align: middle;
+        }
+
+        body.combined-one-page .schedule-table th {
+            background: #e8eef8;
+            color: #1f3355;
+            font-size: 0.88rem;
+            white-space: nowrap;
+        }
+
+        body.combined-one-page .schedule-table tbody tr:hover {
+            background: #f6f9fe;
+        }
+
+        /* Differentiate completed and overdue tasks in the schedule. */
+        body.combined-one-page .schedule-table .task-completed {
+            background: #eff9f2;
+        }
+
+        body.combined-one-page .schedule-table .task-overdue {
+            background: #fff1ef;
+        }
+
+        body.combined-one-page .schedule-table td button+button {
+            margin-left: 6px;
+        }
+
+        body.combined-one-page .complete-btn {
+            background: #378657;
+        }
+
+        body.combined-one-page .complete-btn:hover {
+            background: #286d43;
+        }
+
+        body.combined-one-page .recover-btn {
+            background: #bd6b21;
+        }
+
+        body.combined-one-page .recover-btn:hover {
+            background: #995317;
+        }
+
+        /* Navigation between the planner and the completed-tasks page. */
+        body.combined-one-page .page-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: -8px 0 24px;
+        }
+
+        body.combined-one-page .nav-link {
+            padding: 9px 16px;
+            border-radius: 999px;
+            background: #e8eef8;
+            color: #1f3a68;
+            font-weight: 650;
+            text-decoration: none;
+            transition: background-color 160ms ease;
+        }
+
+        body.combined-one-page .nav-link:hover {
+            background: #d3def0;
+        }
+
+        body.combined-one-page .nav-link.active {
+            background: #2f5597;
+            color: #fff;
+        }
+
+        body.combined-one-page .empty-row td {
+            padding: 28px 12px;
+            color: #3f5a8a;
+            text-align: center;
+        }
+
+        body.combined-one-page .success-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: none;
+            padding: 15px 20px;
+            border-radius: 12px;
+            background: #378657;
+            box-shadow: 0 8px 24px rgb(0 0 0 / 18%);
+            color: #fff;
+            font-weight: 700;
+        }
+
+        /* Fixed in-page reminder cards with completion and dismissal actions. */
+        body.combined-one-page .reminder-container {
+            position: fixed;
+            top: 84px;
+            right: 20px;
+            z-index: 1001;
+            display: grid;
+            width: min(360px, calc(100vw - 40px));
+            gap: 12px;
+        }
+
+        body.combined-one-page .reminder-card {
+            padding: 16px;
+            border: 1px solid #c4d3ea;
+            border-radius: 14px;
+            background: #fff;
+            box-shadow: 0 10px 28px rgb(20 35 70 / 18%);
+            color: #1b2a4a;
+        }
+
+        body.combined-one-page .reminder-card p {
+            margin: 8px 0 12px;
+        }
+
+        body.combined-one-page .reminder-card-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        body.combined-one-page .reminder-card button {
+            width: auto;
+        }
+
+        body.combined-one-page .reminder-card .complete-btn {
+            flex: 1;
+        }
+
+        body.combined-one-page .reminder-card .reminder-dismiss {
+            background: #dde5f1;
+            color: #1b2a4a;
+        }
+
+        body.combined-one-page .reminder-card .reminder-dismiss:hover {
+            background: #c7d4ea;
+        }
+
+        @media (max-width: 680px) {
+
+            /* Keep the form readable and the wide schedule table scrollable on phones. */
+            body.combined-one-page {
+                padding: 12px;
+            }
+
+            .logob {
+                width: 50%;
+                display: flex;
+                justify-content: left;
+                left: 5px;
+            }
+
+            .logob img {
+                position: relative;
+                left: 4px;
+            }
+
+            body.combined-one-page .planbox {
+                padding: 18px;
+                border-radius: 18px;
+            }
+
+            body.combined-one-page .planner-form {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            body.combined-one-page .classification,
+            body.combined-one-page .submit {
+                grid-column: auto;
+            }
+
+            body.combined-one-page .slider-box {
+                flex-direction: row;
+                align-items: center;
+            }
+
+            body.combined-one-page .schedule-table {
+                display: table;
+                min-width: 760px;
+                white-space: normal;
+            }
+
+            body.combined-one-page .schedule-table button {
+                width: auto;
+            }
+
+            body.combined-one-page .reminder-container {
+                right: 12px;
+                width: min(360px, calc(100vw - 24px));
+            }
+
+        }
+    </style>
+</head>
+
+<body class="combined-one-page">
+
+    <div class="planbox">
+        <h1>
+            <img src="syncdate-wordmark.png" alt="SyncDate" class="logob">
+        </h1>
+
+        <nav class="page-nav" aria-label="Planner pages">
+            <a class="nav-link active" href="planner.html" aria-current="page">📅 Planner</a>
+            <a class="nav-link" href="completed.html">
+                <img src="icon-list.svg" alt="checklist icon"
+                    style="width: 16px; height: 16px; vertical-align: middle; margin-right: 4px;">
+                Completed Tasks</a>
+        </nav>
+
+
+        <!-- 1. The Form -->
+        <div class="form-section">
+            <form id="task-form" , class="planner-form">
+                <div class="form-field">
+                    <label for="task-description">Task Description</label>
+                    <input type="text" , id="task-description" , placeholder="e.g., Data Structures Homework" ,
+                        required>
+                </div>
+
+                <div class="form-field">
+                    <label for="task-place">Place</label>
+                    <input type="text" , id="task-place" , placeholder="e.g., Room 302">
+                </div>
+
+                <div class="form-field">
+                    <label for="task-type">Task Type</label>
+                    <select id="task-type" , required>
+                        <option value="" disabled selected>Select a task type</option>
+                        <option value="Problem Solving">🧮 Problem Solving</option>
+                        <option value="Essay">📝 Essay</option>
+                        <option value="Research">🔍 Research</option>
+                        <option value="Thesis">📚 Thesis</option>
+                        <option value="Presentation">🎤 Presentation</option>
+                        <option value="Laboratory">🧪 Laboratory</option>
+                        <option value="Programming">💻 Programming</option>
+                        <option value="Group Project">👥 Group Project</option>
+                        <option value="Quiz Review">📖 Quiz Review</option>
+                        <option value="Exam Preparation">🎯 Exam Preparation</option>
+                    </select>
+                </div>
+
+                <div class="form-field">
+                    <label for="task-date">Due Date &amp; Time</label>
+                    <input type="datetime-local" , id="task-date" , required>
+                </div>
+
+                <div class="form-field">
+                    <label for="task-urgency">🚨 Urgency</label>
+                    <div class="slider-box">
+                        <img src="icon-l3.svg" id="urgency-emoji" , aria-hidden="true">
+                        <input type="range" id="task-urgency" min="1" max="5" value="3">
+                        <small id="urgency-text">Moderate</small>
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label for="task-importance">⭐ Importance</label>
+                    <div class="slider-box">
+                        <img id="importance-emoji" src="icon8-l3.svg" aria-hidden="true">
+                        <input type="range" id="task-importance" min="1" max="5" value="3">
+                        <small id="importance-text">Important</small>
+                    </div>
+                </div>
+                <div class="classification">
+                    Classification: <span id="priority-level">🟡 Moderate Priority</span>
+                </div>
+
+                <button class="submit" , type="submit">➕ Add to Schedule</button>
+            </form>
+        </div>
+
+        <div class="dashboard">
+            <h3>Dashboard</h3>
+            <p>Tasks Completed: <span id="progress-text">0 / 0</span></p>
+            <progress id="progress-bar" , value="0" , max="100" , aria-label="Task completion progress"></progress>
+        </div>
+
+        <div class="my_schedule">
+            <h2>My Schedule & Ranked Tasks</h2>
+            <div class="table-wrapper">
+                <table class="schedule-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Rank</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Place</th>
+                            <th scope="col">Due Date</th>
+                            <th scope="col">Priority Level</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="task-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="success-message" , class="success-message" , role="status" , aria-live="polite">
+            ✅ Task Successfully Added!
+        </div>
+        <div id="reminder-container" , class="reminder-container" , role="status" , aria-live="polite" ,
+            aria-relevant="additions"></div>
+
+        <script>
+            // Restore saved tasks so the schedule survives page reloads.
+            let tasks = JSON.parse(localStorage.getItem('student_tasks')) || [];
+
+            // Cache the page controls; the fallback selectors support the older combined.html page.
+            const taskForm = document.getElementById('task-form');
+            const taskTableBody = document.getElementById('task-table-body');
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            const descriptionInput = document.getElementById('task-description') || document.getElementById('task-name');
+            const taskTypeInput = document.getElementById('task-type') || document.querySelector('#task-form select');
+            const hasTaskTypeColumn = taskTableBody.closest('table').querySelectorAll('thead th').length > 6;
+            const reminderContainer = document.getElementById('reminder-container');
+
+            // Convert the selected importance level into the lead time for its reminder.
+            function getReminderLeadTime(importance) {
+                const leadTimes = {
+                    1: 30 * 60 * 1000,
+                    2: 30 * 60 * 1000,
+                    3: 60 * 60 * 1000,
+                    4: 2 * 60 * 60 * 1000,
+                    5: 3 * 60 * 60 * 1000
+                };
+
+                return leadTimes[importance];
+            }
+
+            function scheduleReminder(task) {
+                const reminderTime = new Date(task.date).getTime() - getReminderLeadTime(task.importance);
+                task.nextReminderAt = new Date(reminderTime).toISOString();
+            }
+
+            // Validate a new task, prevent schedule conflicts, then save and display it.
+            taskForm.addEventListener('submit', function (e) {
+                e.preventDefault(); // Stops the page from refreshing
+
+                const name = descriptionInput.value.trim();
+                const place = document.getElementById('task-place').value;
+                const type = taskTypeInput.value;
+                const date = document.getElementById('task-date').value;
+                const urgency = parseInt(document.getElementById('task-urgency').value);
+                const importance = parseInt(document.getElementById('task-importance').value);
+
+                const totalPriority = urgency + importance;
+
+                let priorityLevel = "";
+
+                if (totalPriority <= 3) {
+                    priorityLevel = "🟢 Low";
+                }
+                else if (totalPriority <= 6) {
+                    priorityLevel = "🟡 Moderate";
+                }
+                else if (totalPriority <= 8) {
+                    priorityLevel = "🟠 High";
+                }
+                else {
+                    priorityLevel = "🔴 Critical";
+                }
+
+                const newStartDate = new Date(date);
+                const newEndDate = new Date(newStartDate.getTime() + 60 * 60 * 1000); // Assume 1-hour duration
+
+                // Each task reserves a one-hour time slot; ignore completed tasks.
+                const hasConflict = tasks.some(task => {
+                    if (task.completed) return false;
+                    const existingStart = new Date(task.date);
+                    const existingEnd = new Date(existingStart.getTime() + 60 * 60 * 1000);
+
+                    return newStartDate < existingEnd && newEndDate > existingStart;
+                });
+
+                if (hasConflict) {
+                    alert("⚠️ Schedule Conflict Detected! You already have a task scheduled around this time slot.");
+                    return;
+                }
+
+                const newTask = {
+                    id: Date.now(),
+                    name,
+                    place,
+                    type,
+                    date,
+                    urgency,
+                    importance,
+                    priorityLevel,
+                    completed: false
+                };
+
+                if (reminderContainer) {
+                    scheduleReminder(newTask);
+                }
+
+                tasks.push(newTask);
+                saveAndRender();
+                taskForm.reset();
+                urgencySlider.dispatchEvent(new Event('input'));
+                importanceSlider.dispatchEvent(new Event('input'));
+
+                const successMessage = document.getElementById('success-message');
+                successMessage.style.display = 'block';
+                setTimeout(() => {
+                    successMessage.style.display = 'none';
+                }, 3000);
+
+                checkReminders();
+            });
+
+            // Build reminder cards using text nodes so task input is never parsed as HTML.
+            function showReminder(task) {
+                const card = document.createElement('section');
+                card.className = 'reminder-card';
+                card.dataset.taskId = task.id;
+
+                const heading = document.createElement('strong');
+                heading.textContent = '⏰ Task reminder';
+
+                const message = document.createElement('p');
+                message.textContent = `${task.name} is due ${new Date(task.date).toLocaleString()}. Importance: ${task.importance}/5.`;
+
+                const actions = document.createElement('div');
+                actions.className = 'reminder-card-actions';
+
+                const completeButton = document.createElement('button');
+                completeButton.type = 'button';
+                completeButton.className = 'complete-btn';
+                completeButton.textContent = 'Mark complete';
+                completeButton.addEventListener('click', () => toggleComplete(task.id));
+
+                const dismissButton = document.createElement('button');
+                dismissButton.type = 'button';
+                dismissButton.className = 'reminder-dismiss';
+                dismissButton.textContent = 'Dismiss';
+                dismissButton.addEventListener('click', () => card.remove());
+
+                actions.append(completeButton, dismissButton);
+                card.append(heading, message, actions);
+                reminderContainer.appendChild(card);
+
+                setTimeout(() => card.remove(), 15000);
+            }
+
+            function checkReminders() {
+                if (!reminderContainer) {
+                    return;
+                }
+
+                const now = Date.now();
+                const dueReminders = tasks.filter(task =>
+                    !task.completed && task.nextReminderAt && new Date(task.nextReminderAt).getTime() <= now
+                );
+
+                dueReminders.forEach(task => {
+                    showReminder(task);
+                    task.nextReminderAt = new Date(now + 10 * 60 * 1000).toISOString();
+                });
+
+                if (dueReminders.length > 0) {
+                    localStorage.setItem('student_tasks', JSON.stringify(tasks));
+                }
+            }
+
+            // Rank tasks by time remaining, urgency, and importance.
+            function calculateScore(task) {
+                const now = new Date();
+                const dueDate = new Date(task.date);
+                const hoursRemaining = Math.max((dueDate - now) / (1000 * 60 * 60), 0.1);
+
+                const timeScore = (1 / hoursRemaining) * 1000;
+                const totalScore = timeScore + (task.urgency * 10) + (task.importance * 15);
+
+                return Math.round(totalScore);
+            }
+
+            // Rebuild the schedule in priority order and mark completed or overdue rows.
+            function renderTasks() {
+                taskTableBody.innerHTML = ''; // Clear current table content
+
+                tasks.forEach(task => task.score = calculateScore(task));
+                tasks.sort((a, b) => b.score - a.score); // Sort highest score first
+
+                // Completed tasks live on completed.html; only active tasks are listed here.
+                const completedCount = tasks.filter(task => task.completed).length;
+                const activeTasks = tasks.filter(task => !task.completed);
+
+                if (activeTasks.length === 0) {
+                    const emptyRow = document.createElement('tr');
+                    emptyRow.className = 'empty-row';
+                    const emptyCell = emptyRow.insertCell();
+                    emptyCell.colSpan = hasTaskTypeColumn ? 7 : 6;
+                    emptyCell.textContent = '🎉 No pending tasks. Add one above, or review your finished work on the Completed Tasks page.';
+                    taskTableBody.appendChild(emptyRow);
+                }
+
+                activeTasks.forEach((task, index) => {
+                    const now = new Date();
+                    const isOverdue = new Date(task.date) < now && !task.completed;
+
+                    const row = document.createElement('tr');
+                    if (task.completed) {
+                        row.classList.add('task-completed');
+                    } else if (isOverdue) {
+                        row.classList.add('task-overdue');
+                    }
+
+                    row.insertCell().textContent = `#${index + 1}`;
+
+                    const descriptionCell = row.insertCell();
+                    descriptionCell.textContent = task.name;
+                    if (isOverdue) {
+                        const overdueLabel = document.createElement('strong');
+                        overdueLabel.textContent = ' ⚠️ (OVERDUE)';
+                        descriptionCell.appendChild(overdueLabel);
+                    }
+
+                    if (hasTaskTypeColumn) {
+                        row.insertCell().textContent = task.type || '—';
+                    }
+                    row.insertCell().textContent = task.place || 'N/A';
+                    row.insertCell().textContent = task.date.replace('T', ' ');
+
+                    const priorityCell = row.insertCell();
+                    const priorityLabel = document.createElement('strong');
+                    priorityLabel.textContent = task.priorityLevel;
+                    priorityCell.appendChild(priorityLabel);
+
+                    const actionCell = row.insertCell();
+                    if (isOverdue) {
+                        const recoverButton = document.createElement('button');
+                        recoverButton.type = 'button';
+                        recoverButton.className = 'recover-btn';
+                        recoverButton.textContent = 'Recover';
+                        recoverButton.addEventListener('click', () => recoverTask(task.id));
+                        actionCell.appendChild(recoverButton);
+                    }
+
+                    const completeButton = document.createElement('button');
+                    completeButton.type = 'button';
+                    completeButton.className = 'complete-btn';
+                    completeButton.textContent = task.completed ? 'Done ✅' : 'Complete';
+                    completeButton.addEventListener('click', () => toggleComplete(task.id));
+                    actionCell.appendChild(completeButton);
+
+                    taskTableBody.appendChild(row);
+                });
+
+                updateDashboard(completedCount);
+            }
+
+            // Keep the completed-task count and progress bar in sync with the schedule.
+            function updateDashboard(completedCount) {
+                const totalTasks = tasks.length;
+                progressText.innerText = `${completedCount} / ${totalTasks}`;
+
+                if (totalTasks > 0) {
+                    progressBar.value = (completedCount / totalTasks) * 100;
+                } else {
+                    progressBar.value = 0;
+                }
+            }
+
+            // Toggle completion, clear that task's visible reminder, and persist the change.
+            function toggleComplete(id) {
+                tasks = tasks.map(task => {
+                    if (task.id === id) {
+                        task.completed = !task.completed;
+                        task.completedAt = task.completed ? new Date().toISOString() : null;
+                    }
+                    return task;
+                });
+
+                const updatedTask = tasks.find(task => task.id === id);
+                if (updatedTask && updatedTask.completed && reminderContainer) {
+                    reminderContainer.querySelectorAll('.reminder-card').forEach(card => {
+                        if (card.dataset.taskId === String(id)) {
+                            card.remove();
+                        }
+                    });
+                }
+
+                saveAndRender();
+            }
+
+            // Move an overdue deadline forward by one day and recalculate its reminder.
+            function recoverTask(id) {
+                tasks = tasks.map(task => {
+                    if (task.id === id) {
+                        const currentDate = new Date(task.date);
+                        currentDate.setDate(currentDate.getDate() + 1);
+                        task.date = currentDate.toISOString().slice(0, 16);
+                        if (reminderContainer) {
+                            scheduleReminder(task);
+                        }
+                    }
+                    return task;
+                });
+                saveAndRender();
+            }
+
+            // Persist task changes and refresh the rendered schedule.
+            function saveAndRender() {
+                localStorage.setItem('student_tasks', JSON.stringify(tasks));
+                renderTasks();
+            }
+
+            // Add reminder dates for older saved tasks, then render and start reminder checks.
+            if (reminderContainer) {
+                let reminderScheduleChanged = false;
+                tasks.forEach(task => {
+                    if (!task.completed && !task.nextReminderAt) {
+                        scheduleReminder(task);
+                        reminderScheduleChanged = true;
+                    }
+                });
+
+                if (reminderScheduleChanged) {
+                    localStorage.setItem('student_tasks', JSON.stringify(tasks));
+                }
+            }
+
+            renderTasks();
+
+            if (reminderContainer) {
+                checkReminders();
+                setInterval(checkReminders, 30 * 1000);
+            }
+
+            // Update the emoji and text labels as the urgency and importance sliders move.
+            const urgencySlider = document.getElementById("task-urgency");
+            const importanceSlider = document.getElementById("task-importance");
+
+            urgencySlider.addEventListener("input", function () {
+
+                const icons = [
+                    "icon-l1.svg",
+                    "icon-l2.svg",
+                    "icon-l3.svg",
+                    "icon-l4.svg",
+                    "icon-l5.svg"
+                ];
+
+                const levels = [
+                    "Basic",
+                    "Low",
+                    "Moderate",
+                    "High",
+                    "Critical"
+                ];
+
+                document.getElementById("urgency-emoji").src =
+                    icons[this.value - 1];
+
+                document.getElementById("urgency-text").textContent =
+                    levels[this.value - 1];
+            });
+
+            importanceSlider.addEventListener("input", function () {
+
+                const icons = [
+                    "icon6-l1.svg",
+                    "icon7-l2.svg",
+                    "icon8-l3.svg",
+                    "icon9-l4.svg",
+                    "icon10-l5.svg"
+                ];
+
+                const levels = [
+                    "Basic",
+                    "Minor",
+                    "Important",
+                    "Major",
+                    "Priority"
+                ];
+
+                document.getElementById("importance-emoji").src = icons[this.value - 1];
+                document.getElementById("importance-text").textContent = levels[this.value - 1];
+            });
+
+            // Show a live priority classification based on both slider values.
+            function updatePriorityLevel() {
+
+                const urgency =
+                    parseInt(document.getElementById("task-urgency").value);
+
+                const importance =
+                    parseInt(document.getElementById("task-importance").value);
+
+                const total = urgency + importance;
+
+                if (total <= 3) {
+                    document.getElementById("priority-level").textContent =
+                        "🟢 Low Priority";
+                }
+                else if (total <= 6) {
+                    document.getElementById("priority-level").textContent =
+                        "🟡 Moderate Priority";
+                }
+                else if (total <= 8) {
+                    document.getElementById("priority-level").textContent =
+                        "🟠 High Priority";
+                }
+                else {
+                    document.getElementById("priority-level").textContent =
+                        "🔴 Critical Priority";
+                }
+            }
+
+            // Recalculate the live priority label whenever either rating changes.
+            urgencySlider.addEventListener("input", updatePriorityLevel);
+            importanceSlider.addEventListener("input", updatePriorityLevel);
+
+            updatePriorityLevel();
+
+        </script>
+</body>
+
+</html>

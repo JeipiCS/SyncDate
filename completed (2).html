@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=ADLaM+Display" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="sync-icon2.jpg" width='256' height='256' viewBox='0 0 256 256'
+        %3E%3Crect style='fill:%23FF3010;stroke:none' width='256' height='256' x='0' y='0' /%3E%3C/svg%3E">
+
+    <title>Completed Tasks – My Student Calendar</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        .logob {
+            width: 50%;
+            display: flex;
+            justify-content: left;
+            left: 5px;
+        }
+
+        .logob img {
+            position: relative;
+            left: 4px;
+        }
+
+
+        body {
+            min-width: 320px;
+            margin: 0;
+            padding: clamp(16px, 4vw, 48px);
+            color-scheme: light;
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            color: #1c2433;
+            background:
+                radial-gradient(ellipse at top left, #d6e4f7 0, transparent 38%),
+                #f3f6fb;
+        }
+
+        .planbox {
+            width: min(1120px, 100%);
+            margin: 0 auto;
+            padding: clamp(20px, 4vw, 40px);
+            background: #fff;
+            border: 1px solid #dde5f1;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgb(20 35 70 / 10%);
+        }
+
+        h1 {
+            margin: 0 0 28px;
+            color: #1b2a4a;
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+        }
+
+        h2 {
+            margin: 0 0 16px;
+            color: #1b2a4a;
+            font-size: 1.35rem;
+        }
+
+        h3 {
+            margin: 0 0 10px;
+        }
+
+        /* Navigation */
+        .page-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: -8px 0 24px;
+        }
+
+        .nav-link {
+            padding: 9px 16px;
+            border-radius: 999px;
+            background: #e8eef8;
+            color: #1f3a68;
+            font-weight: 650;
+            text-decoration: none;
+            transition: background-color 160ms ease;
+        }
+
+        .nav-link:hover {
+            background: #d3def0;
+        }
+
+        .nav-link.active {
+            background: #2f5597;
+            color: #fff;
+        }
+
+        /* Summary panel */
+        .dashboard {
+            margin: 28px 0;
+            padding: 20px;
+            border-radius: 16px;
+            background: #1f3a68;
+            color: #fff;
+        }
+
+        .dashboard p {
+            margin: 0 0 12px;
+        }
+
+        progress {
+            display: block;
+            width: 100%;
+            height: 12px;
+            overflow: hidden;
+            border: 0;
+            border-radius: 999px;
+            background: #d3def0;
+            accent-color: #8fb4ee;
+        }
+
+        progress::-webkit-progress-bar {
+            border-radius: 999px;
+            background: #d3def0;
+        }
+
+        progress::-webkit-progress-value {
+            border-radius: 999px;
+            background: #8fb4ee;
+        }
+
+        progress::-moz-progress-bar {
+            border-radius: 999px;
+            background: #8fb4ee;
+        }
+
+        /* Completed list */
+        .completed-section {
+            padding: clamp(16px, 3vw, 24px);
+            border: 1px solid #dde5f1;
+            border-radius: 18px;
+            background: #fff;
+        }
+
+        .section-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .section-header h2 {
+            margin: 0;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .schedule-table th,
+        .schedule-table td {
+            padding: 13px 12px;
+            border-bottom: 1px solid #dde5f1;
+            vertical-align: middle;
+            font-size: 14px;
+        }
+
+        .schedule-table th {
+            background: #e8eef8;
+            color: #1f3355;
+            font-size: 0.88rem;
+            white-space: nowrap;
+        }
+
+        .schedule-table tbody tr {
+            background: #eff9f2;
+        }
+
+        .schedule-table tbody tr:hover {
+            background: #e3f4e9;
+        }
+
+        .schedule-table td button+button {
+            margin-left: 6px;
+        }
+
+        .empty-row td {
+            padding: 28px 12px;
+            color: #3f5a8a;
+            text-align: center;
+        }
+
+        button {
+            min-height: 38px;
+            padding: 8px 14px;
+            border: 0;
+            border-radius: 10px;
+            color: #fff;
+            font: inherit;
+            font-weight: 650;
+            cursor: pointer;
+            transition: background-color 160ms ease, transform 160ms ease;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+        }
+
+        button:focus-visible,
+        .nav-link:focus-visible {
+            outline: 3px solid #6c9bd8;
+            outline-offset: 2px;
+        }
+
+        .restore-btn {
+            background: #bd6b21;
+        }
+
+        .restore-btn:hover {
+            background: #995317;
+        }
+
+        .delete-btn {
+            background: #b3392f;
+        }
+
+        .delete-btn:hover {
+            background: #8f2c24;
+        }
+
+        .clear-btn {
+            background: #2f5597;
+        }
+
+        .clear-btn:hover {
+            background: #244480;
+        }
+
+        .clear-btn[hidden] {
+            display: none;
+        }
+
+        @media (max-width: 680px) {
+            body {
+                padding: 12px;
+            }
+
+            .planbox {
+                padding: 18px;
+                border-radius: 18px;
+            }
+
+            h1 {
+                font-size: 24px;
+                text-align: center;
+            }
+
+            .schedule-table {
+                min-width: 700px;
+            }
+
+        }
+    </style>
+</head>
+
+<body>
+    <div class="planbox">
+        <h1>
+            <img src="syncdate-wordmark.png" alt="SyncDate" class="logob">
+        </h1>
+
+        <nav class="page-nav" aria-label="Planner pages">
+            <a class="nav-link" href="planner.html">📅 Planner</a>
+            <a class="nav-link active" href="completed.html" aria-current="page">
+                <img src="icon-list.svg" alt="checklist icon"
+                    style="width: 16px; height: 16px; vertical-align: middle; margin-right: 4px;">
+                Completed Tasks
+            </a>
+        </nav>
+        <div class="dashboard">
+            <h3>Progress</h3>
+            <p>Tasks Completed: <span id="progress-text">0 / 0</span></p>
+            <progress id="progress-bar" value="0" max="100" aria-label="Task completion progress"></progress>
+        </div>
+
+        <div class="completed-section">
+            <div class="section-header">
+                <h2>Completed Tasks</h2>
+                <button type="button" id="clear-all" class="clear-btn" hidden>🗑️ Clear All</button>
+            </div>
+            <div class="table-wrapper">
+                <table class="schedule-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Place</th>
+                            <th scope="col">Due Date</th>
+                            <th scope="col">Completed On</th>
+                            <th scope="col">Priority Level</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="completed-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Same storage key as the planner page, so both pages share one task list.
+        let tasks = [];
+        try {
+            tasks = JSON.parse(localStorage.getItem('student_tasks')) || [];
+        } catch (error) {
+            tasks = [];
+        }
+
+        const tableBody = document.getElementById('completed-table-body');
+        const progressText = document.getElementById('progress-text');
+        const progressBar = document.getElementById('progress-bar');
+        const clearAllButton = document.getElementById('clear-all');
+
+        function saveTasks() {
+            localStorage.setItem('student_tasks', JSON.stringify(tasks));
+        }
+
+        function formatDate(isoString) {
+            if (!isoString) return '—';
+            return new Date(isoString).toLocaleString([], {
+                dateStyle: 'medium',
+                timeStyle: 'short'
+            });
+        }
+
+        // Send a task back to the planner page as an active task.
+        function restoreTask(id) {
+            const task = tasks.find(t => t.id === id);
+            if (!task) return;
+            task.completed = false;
+            task.completedAt = null;
+            saveTasks();
+            render();
+        }
+
+        // Permanently remove a single completed task.
+        function deleteTask(id) {
+            if (!confirm('Delete this completed task permanently?')) return;
+            tasks = tasks.filter(t => t.id !== id);
+            saveTasks();
+            render();
+        }
+
+        // Permanently remove every completed task (active tasks are kept).
+        clearAllButton.addEventListener('click', () => {
+            if (!confirm('Delete ALL completed tasks permanently? This cannot be undone.')) return;
+            tasks = tasks.filter(t => !t.completed);
+            saveTasks();
+            render();
+        });
+
+        function render() {
+            tableBody.innerHTML = '';
+
+            // Most recently completed first; older tasks without a timestamp fall back to due date.
+            const completed = tasks
+                .filter(task => task.completed)
+                .sort((a, b) =>
+                    new Date(b.completedAt || b.date) - new Date(a.completedAt || a.date)
+                );
+
+            clearAllButton.hidden = completed.length === 0;
+
+            if (completed.length === 0) {
+                const emptyRow = document.createElement('tr');
+                emptyRow.className = 'empty-row';
+                const emptyCell = emptyRow.insertCell();
+                emptyCell.colSpan = 8;
+                emptyCell.textContent = 'Nothing here yet. Tasks you mark complete on the Planner page will show up here.';
+                tableBody.appendChild(emptyRow);
+            }
+
+            completed.forEach((task, index) => {
+                const row = document.createElement('tr');
+
+                row.insertCell().textContent = index + 1;
+
+                // textContent keeps task text from ever being parsed as HTML.
+                row.insertCell().textContent = task.name;
+                row.insertCell().textContent = task.type || '—';
+                row.insertCell().textContent = task.place || 'N/A';
+                row.insertCell().textContent = task.date ? task.date.replace('T', ' ') : '—';
+                row.insertCell().textContent = formatDate(task.completedAt);
+
+                const priorityCell = row.insertCell();
+                const priorityLabel = document.createElement('strong');
+                priorityLabel.textContent = task.priorityLevel || '—';
+                priorityCell.appendChild(priorityLabel);
+
+                const actionCell = row.insertCell();
+
+                const restoreButton = document.createElement('button');
+                restoreButton.type = 'button';
+                restoreButton.className = 'restore-btn';
+                restoreButton.textContent = '↩ Restore';
+                restoreButton.addEventListener('click', () => restoreTask(task.id));
+
+                const deleteButton = document.createElement('button');
+                deleteButton.type = 'button';
+                deleteButton.className = 'delete-btn';
+                deleteButton.textContent = 'Delete';
+                deleteButton.addEventListener('click', () => deleteTask(task.id));
+
+                actionCell.append(restoreButton, deleteButton);
+                tableBody.appendChild(row);
+            });
+
+            // Progress is completed tasks out of ALL tasks, matching the planner dashboard.
+            progressText.textContent = `${completed.length} / ${tasks.length}`;
+            progressBar.value = tasks.length > 0 ? (completed.length / tasks.length) * 100 : 0;
+        }
+
+        // Stay in sync if the planner page changes tasks in another tab.
+        window.addEventListener('storage', event => {
+            if (event.key === 'student_tasks') {
+                try {
+                    tasks = JSON.parse(event.newValue) || [];
+                } catch (error) {
+                    tasks = [];
+                }
+                render();
+            }
+        });
+
+        render();
+    </script>
+</body>
+
+</html>
